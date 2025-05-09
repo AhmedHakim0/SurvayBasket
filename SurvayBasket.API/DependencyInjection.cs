@@ -1,13 +1,20 @@
-﻿namespace SurvayBasket.API;
+﻿using Microsoft.EntityFrameworkCore;
+using SurvayBasket.API.Presistance;
+
+namespace SurvayBasket.API;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddDependencies(this IServiceCollection services)
+    public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllers();
         services.AddMapsterConfig()
                 .AddFluentVlidationConfig();
-            
+
+        var ConnectionString = configuration.GetConnectionString("DefaultConnection") ??
+                               throw new Exception("Connection string 'DefaultConnection' not found");
+
+        services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(ConnectionString));
 
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -32,5 +39,5 @@ public static class DependencyInjection
 
         return services;
     }
- 
+
 }

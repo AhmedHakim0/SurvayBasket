@@ -1,7 +1,4 @@
-﻿using Mapster;
-using SurvayBasket.API.Contracts.Response;
-
-namespace SurvayBasket.API.Mapping;
+﻿namespace SurvayBasket.API.Mapping;
 
 public class MappingCofiguration : IRegister
 {
