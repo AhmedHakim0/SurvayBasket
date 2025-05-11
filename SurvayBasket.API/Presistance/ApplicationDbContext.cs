@@ -1,6 +1,8 @@
-﻿namespace SurvayBasket.API.Presistance;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> option) : DbContext(option)
+namespace SurvayBasket.API.Presistance;
+
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> option) : IdentityDbContext(option)
 {
     public DbSet<Poll> Polls { get; set; }
 

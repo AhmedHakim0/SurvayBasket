@@ -1,4 +1,7 @@
-﻿namespace SurvayBasket.API.Controllers;
+﻿using Microsoft.AspNetCore.Authorization;
+using SurvayBasket.API.Contracts.Polls;
+
+namespace SurvayBasket.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -7,6 +10,7 @@ public class pollsController(IPollService PollService) : ControllerBase
    private readonly IPollService _PollService = PollService;
 
     [HttpGet("")]
+    [Authorize("")]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var Polls = await _PollService.GetAllAsync(cancellationToken);

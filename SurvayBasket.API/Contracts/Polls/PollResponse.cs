@@ -1,4 +1,4 @@
-﻿namespace SurvayBasket.API.Contracts.Response;
+﻿namespace SurvayBasket.API.Contracts.Polls;
 
 public record PollResponse(
 

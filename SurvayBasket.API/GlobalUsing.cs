@@ -7,7 +7,7 @@ global using Microsoft.EntityFrameworkCore;
 global using System.Threading;
 
 
-global using SurvayBasket.API.Contracts.Response;
+global using SurvayBasket.API.Contracts.Polls;
 global using SurvayBasket.API.Presistance;
 global using SurvayBasket.API.Service;
 global using Scalar.AspNetCore;
