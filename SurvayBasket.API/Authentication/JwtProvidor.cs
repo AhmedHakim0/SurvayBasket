@@ -1,12 +1,16 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Options;
+using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 
 namespace SurvayBasket.API.Authentication;
 
-public class JwtProvidor : IJwtProvidor
+public class JwtProvidor(IOptions<JwtOption> options) : IJwtProvidor
 {
+    private readonly JwtOption _options  = options.Value;
+
     public (string token, int expiresIn) GenerateToken(ApplicationUser user)
     {
         Claim[] claims = [
@@ -16,23 +20,51 @@ public class JwtProvidor : IJwtProvidor
             new(JwtRegisteredClaimNames.FamilyName, user.LastName),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         ];
-
-        var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("$|%XF^sN)0c-?X}@eU>iLsr|Ju)7Pc.}Qk+cb:7p0Sy3r7W0nv:~r]i23jf2@/P"));
+        
+       
+        var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
         var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
 
-        var ExpiresIn = 30 * 60;
-
         var token =new JwtSecurityToken(
-            issuer: "SurvayBasket",
-            audience: "SurvayBasket users",
+            issuer: _options.Issuer,
+            audience: _options.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddSeconds(ExpiresIn),
+            expires: DateTime.UtcNow.AddSeconds(_options.ExpiryMinutes),
             signingCredentials: signingCredentials
         );
 
         return (
             token: new JwtSecurityTokenHandler().WriteToken(token),
-            expiresIn: ExpiresIn
+            expiresIn: _options.ExpiryMinutes
         );
+    }
+
+    public string? ValidateToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
+
+        try
+        {
+            tokenHandler.ValidateToken(token, new TokenValidationParameters
+            {
+                IssuerSigningKey = symmetricSecurityKey,
+                ValidateIssuerSigningKey = true,
+               
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero,
+            }, out SecurityToken validatedToken);
+
+            var jwtToken = (JwtSecurityToken)validatedToken;
+            return jwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)?.Value;
+
+        }
+        catch 
+        {
+
+            return null;
+        }
+
     }
 }

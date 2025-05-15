@@ -14,7 +14,7 @@ public static class DependencyInjection
     public static IServiceCollection AddDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllers();
-        services.AddUserManagerConfig();
+        services.AddAuthConfig(configuration);
         services.AddMapsterConfig()
                 .AddFluentVlidationConfig();
 
@@ -50,10 +50,17 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddUserManagerConfig(this IServiceCollection services)
+    public static IServiceCollection AddAuthConfig(this IServiceCollection services,IConfiguration configuration)
     {
         services.AddSingleton<IJwtProvidor,JwtProvidor>();
+        // services.Configure<JwtOption>(configuration.GetSection(JwtOption.SectionName));
+        services.AddOptions<JwtOption>()
+             .BindConfiguration(JwtOption.SectionName)
+             .ValidateDataAnnotations()
+             .ValidateOnStart();
 
+
+        var JwtSetting = configuration.GetSection(JwtOption.SectionName).Get<JwtOption>();
         services.AddIdentity<ApplicationUser, IdentityRole>()
              .AddEntityFrameworkStores<ApplicationDbContext>();
 
@@ -70,9 +77,9 @@ public static class DependencyInjection
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("$|%XF^sN)0c-?X}@eU>iLsr|Ju)7Pc.}Qk+cb:7p0Sy3r7W0nv:~r]i23jf2@/P")),
-                    ValidIssuer = "SurvayBasket",
-                    ValidAudience = "SurvayBasket users"
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtSetting?.Key!)),
+                    ValidIssuer = JwtSetting?.Issuer,
+                    ValidAudience = JwtSetting?.Audience
                 };
             });
         return services;

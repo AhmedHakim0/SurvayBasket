@@ -1,4 +1,4 @@
-﻿namespace SurvayBasket.API.EnrtitiesConfiguration;
+﻿namespace SurvayBasket.API.Presistance.EnrtitiesConfiguration;
 
 public class PollConfiguration : IEntityTypeConfiguration<Poll>
 {

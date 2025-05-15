@@ -14,8 +14,10 @@ global using Scalar.AspNetCore;
 global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.Mvc;
 global using SurvayBasket.API.Entities;
-global using SurvayBasket.API.Contracts.Request;
+global using SurvayBasket.API.Contracts.Authentication;
 global using Microsoft.EntityFrameworkCore.Metadata.Builders;
+global using SurvayBasket.API.Contracts.Request;
+
 
 
 
