@@ -5,12 +5,13 @@ namespace SurvayBasket.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class pollsController(IPollService PollService) : ControllerBase
 {
    private readonly IPollService _PollService = PollService;
 
     [HttpGet("")]
-    [Authorize("")]
+   
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var Polls = await _PollService.GetAllAsync(cancellationToken);
@@ -29,7 +30,7 @@ public class pollsController(IPollService PollService) : ControllerBase
     public async Task<IActionResult> Add([FromBody] PollRequest Request, CancellationToken cancellationToken)
     {
         var newPoll = await _PollService.AddAsync(Request.Adapt<Poll>(), cancellationToken);
-        return CreatedAtAction(nameof(Get), new { id = newPoll.Id }, newPoll);
+        return CreatedAtAction(nameof(Get), new { id = newPoll.Id }, newPoll.Adapt<PollResponse>());
     }
 
     [HttpPut("{id}")]

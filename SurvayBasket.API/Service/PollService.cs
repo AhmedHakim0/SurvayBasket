@@ -1,4 +1,4 @@
-﻿
+﻿    
 namespace SurvayBasket.API.Service;
 public class PollService(ApplicationDbContext context) : IPollService
 {

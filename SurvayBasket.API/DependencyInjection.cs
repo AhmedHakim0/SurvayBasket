@@ -1,11 +1,8 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SurvayBasket.API.Authentication;
-using SurvayBasket.API.Presistance;
 
 namespace SurvayBasket.API;
 
@@ -17,6 +14,17 @@ public static class DependencyInjection
         services.AddAuthConfig(configuration);
         services.AddMapsterConfig()
                 .AddFluentVlidationConfig();
+        services.AddCors(options =>
+        {
+            options.AddDefaultPolicy(
+                builder =>
+                {
+                    builder
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+        });
 
         var ConnectionString = configuration.GetConnectionString("DefaultConnection") ??
                                throw new Exception("Connection string 'DefaultConnection' not found");
@@ -26,7 +34,7 @@ public static class DependencyInjection
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         services.AddOpenApi();
-        services.AddScoped<IAuthService,AuthService>();
+        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IPollService, PollService>();
 
 
@@ -50,9 +58,9 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddAuthConfig(this IServiceCollection services,IConfiguration configuration)
+    public static IServiceCollection AddAuthConfig(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<IJwtProvidor,JwtProvidor>();
+        services.AddSingleton<IJwtProvidor, JwtProvidor>();
         // services.Configure<JwtOption>(configuration.GetSection(JwtOption.SectionName));
         services.AddOptions<JwtOption>()
              .BindConfiguration(JwtOption.SectionName)

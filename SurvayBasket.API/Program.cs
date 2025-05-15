@@ -24,6 +24,8 @@ namespace SurvayBasket.API
 
             app.UseHttpsRedirection();
 
+            app.UseCors();
+
             app.UseAuthorization();
 
 
