@@ -16,7 +16,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> option,
         base.OnModelCreating(modelBuilder);
     }
 
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var CurrentUserId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
         var entires = ChangeTracker.Entries<AuditableEntity>();
@@ -25,14 +25,16 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> option,
         {
             if (EntityEntire.State == EntityState.Added)
             {
-                EntityEntire.Property(p => p.CreatedById).CurrentValue= CurrentUserId!;
+                EntityEntire.Property(p => p.CreatedById).CurrentValue = CurrentUserId!;
             }
             else if (EntityEntire.State == EntityState.Modified)
             {
                 EntityEntire.Property(p => p.UpdatedById).CurrentValue = CurrentUserId;
                 EntityEntire.Property(p => p.UpdatedOn).CurrentValue = DateTime.UtcNow;
+                        
             }
+          
         }
-        return base.SaveChangesAsync(cancellationToken);
+        return await base.SaveChangesAsync(cancellationToken);
     }
 }
